@@ -8,7 +8,7 @@ RUN npm run build
 
 # Stage 2: Production Python Backend + Serving Frontend
 FROM python:3.11-slim
-WORKDIR /app
+WORKDIR /app/backend
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,21 +16,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements and install
-COPY backend/requirements.txt ./backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source code
-COPY backend/ ./backend/
+# Copy backend source code directly into /app/backend
+COPY backend/ ./
 
-# Copy static frontend build from Stage 1 into backend-accessible location
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+# Copy static frontend build from Stage 1 into /app/frontend/dist
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 
 # Expose production port 8000
 EXPOSE 8000
 
-# Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH="/app/backend:/app"
+ENV PYTHONPATH="/app/backend"
 ENV PORT=8000
 
 # Command to launch single-server unified application

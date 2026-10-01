@@ -1,7 +1,7 @@
 import os
 import sys
 
-# Ensure backend directory is in Python path for absolute & relative imports
+# Add backend root directory to sys.path so 'app' is found natively everywhere
 BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
@@ -11,10 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-try:
-    from app.api.endpoints import router as api_router
-except ImportError:
-    from backend.app.api.endpoints import router as api_router
+from app.api.endpoints import router as api_router
 
 app = FastAPI(
     title="CodeTrace AI API",
@@ -37,7 +34,8 @@ app.include_router(api_router, prefix="/api")
 # Path to static frontend dist build
 FRONTEND_DIST = os.path.abspath(
     os.path.join(
-        os.path.dirname(os.path.dirname(BACKEND_DIR)),
+        BACKEND_DIR,
+        "..",
         "frontend",
         "dist"
     )
