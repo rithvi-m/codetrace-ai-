@@ -13,7 +13,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    && rm -rf /var/lib/apt/get/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy backend requirements and install
 COPY backend/requirements.txt ./backend/requirements.txt
@@ -30,7 +30,8 @@ EXPOSE 8000
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH="/app/backend:/app"
 ENV PORT=8000
 
 # Command to launch single-server unified application
-CMD ["python", "-m", "uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
